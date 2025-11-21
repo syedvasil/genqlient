@@ -130,9 +130,22 @@ func (w *webSocketClient) listenWebSocket() {
 	}
 }
 
-func (w *webSocketClient) forwardWebSocketData(message []byte) error {
+func (w *webSocketClient) forwardWebSocketData(message []byte) (err error) {
+	// Recover from panic if channel is closed
+	defer func() {
+		if r := recover(); r != nil {
+			// Check if it's a send on closed channel panic
+			if panicErr, ok := r.(error); ok && strings.Contains(panicErr.Error(), "send on closed channel") {
+				err = nil // Ignore send on closed channel errors
+				return
+			}
+			// Re-panic if it's a different panic
+			panic(r)
+		}
+	}()
+
 	var wsMsg webSocketReceiveMessage
-	err := json.Unmarshal(message, &wsMsg)
+	err = json.Unmarshal(message, &wsMsg)
 	if err != nil {
 		return err
 	}
