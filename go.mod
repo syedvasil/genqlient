@@ -2,8 +2,6 @@ module github.com/Khan/genqlient
 
 go 1.22.5
 
-toolchain go1.23.3
-
 require (
 	github.com/99designs/gqlgen v0.17.57
 	github.com/alexflint/go-arg v1.5.1
